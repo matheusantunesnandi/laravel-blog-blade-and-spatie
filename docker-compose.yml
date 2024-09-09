@@ -1,0 +1,35 @@
+services:
+  webapp:
+    build:
+      context: .docker/php
+      dockerfile: Dockerfile
+    container_name: webapp
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html/webapp
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APACHE_LOG_DIR: /var/www/html/webapp/storage/logs/apache2
+      
+  db:
+    build:
+      context: .docker/database
+      dockerfile: Dockerfile
+    container_name: webapp-db
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+
+volumes:
+  db-data:
+    name: webapp-db-data
+    external: false
